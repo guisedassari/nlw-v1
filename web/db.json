@@ -1,0 +1,35 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "title": "Baterias",
+      "image_url": "http://localhost:3333/uploads/baterias.svg"
+    },
+    {
+      "id": 2,
+      "title": "Eletronicos",
+      "image_url": "http://localhost:3333/uploads/eletronicos.svg"
+    },
+    {
+      "id": 3,
+      "title": "Lampadas",
+      "image_url": "http://localhost:3333/uploads/lampadas.svg"
+    },
+    {
+      "id": 4,
+      "title": "Oleo",
+      "image_url": "http://localhost:3333/uploads/oleo.svg"
+    },
+
+    {
+      "id": 6,
+      "title": "Organicos",
+      "image_url": "http://localhost:3333/uploads/organicos.svg"
+    },
+    {
+      "id": 7,
+      "title": "Papeis Papelao",
+      "image_url": "http://localhost:3333/uploads/papeis-papelao.svg"
+    }
+  ]
+}
