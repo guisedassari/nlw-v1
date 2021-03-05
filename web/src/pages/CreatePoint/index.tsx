@@ -46,31 +46,44 @@ const CreatePoint = () => {
 
   const [selectedUf, setSelectedUf] = useState("0");
   const [selectedCity, setSelectedCity] = useState("0");
-  const [position, setPosition] = useState<[number, number]>([0, 0]);
+  const [position, setPosition] = useState<[number, number]>([
+    -21.1753259,
+    -47.7933673,
+  ]);
+  const [selectedPosition, setSelectedPosition] = useState<[number, number]>(
+    position
+  );
 
-  // useEffect(() => {
-  //   api.get("items").then((response) => {
-  //     setItems(response.data);
-  //   });
-  // }, []);
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const { latitude, longitude } = position.coords;
+      setPosition([latitude, longitude]);
+    });
+  }, []);
 
-  // useEffect(() => {
-  //   axios
-  //     .get("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
-  //     .then((response) => {
-  //       setUfs(response.data);
-  //     });
-  // }, []);
+  useEffect(() => {
+    api.get("items").then((response) => {
+      setItems(response.data);
+    });
+  }, []);
 
-  // useEffect(() => {
-  //   axios
-  //     .get(
-  //       `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`
-  //     )
-  //     .then((response) => {
-  //       setCities(response.data);
-  //     });
-  // }, [selectedUf]);
+  useEffect(() => {
+    axios
+      .get("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
+      .then((response) => {
+        setUfs(response.data);
+      });
+  }, []);
+
+  useEffect(() => {
+    axios
+      .get(
+        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`
+      )
+      .then((response) => {
+        setCities(response.data);
+      });
+  }, [selectedUf]);
 
   function handleSelectedUF(event: ChangeEvent<HTMLSelectElement>) {
     const uf = event.target.value;
@@ -86,13 +99,12 @@ const CreatePoint = () => {
     const map = useMapEvents({
       click() {
         map.addEventListener("click", (event: LeafletMouseEvent) => {
-          console.log(event.latlng);
-          setPosition([event.latlng.lat, event.latlng.lng]);
+          setSelectedPosition([event.latlng.lat, event.latlng.lng]);
         });
       },
     });
 
-    return <Marker position={position}></Marker>;
+    return <Marker position={selectedPosition}></Marker>;
   }
 
   return (
@@ -135,7 +147,7 @@ const CreatePoint = () => {
             <h2>Endereço</h2>
             <span>Selecione o endereço no mapa</span>
           </legend>
-          <MapContainer center={position} zoom={13}>
+          <MapContainer center={position} zoom={15}>
             <TileLayer
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
