@@ -1,13 +1,26 @@
 import react, { useEffect, useState, ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvent,
+  useMapEvents,
+} from "react-leaflet";
 
 import "./style.css";
 import Header from "../../components/Header";
 import { FiArrowLeft } from "react-icons/fi";
 import api from "../../services/api";
 import axios from "axios";
+import {
+  LatLng,
+  LatLngExpression,
+  LocationEvent,
+  LeafletMouseEvent,
+} from "leaflet";
 
 interface Item {
   id: number;
@@ -23,7 +36,6 @@ interface IbgeUfResponse {
 
 interface IbgeCityResponse {
   id: number;
-
   nome: string;
 }
 
@@ -34,30 +46,31 @@ const CreatePoint = () => {
 
   const [selectedUf, setSelectedUf] = useState("0");
   const [selectedCity, setSelectedCity] = useState("0");
+  const [position, setPosition] = useState<[number, number]>([0, 0]);
 
-  useEffect(() => {
-    api.get("items").then((response) => {
-      setItems(response.data);
-    });
-  }, []);
+  // useEffect(() => {
+  //   api.get("items").then((response) => {
+  //     setItems(response.data);
+  //   });
+  // }, []);
 
-  useEffect(() => {
-    axios
-      .get("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
-      .then((response) => {
-        setUfs(response.data);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
+  //     .then((response) => {
+  //       setUfs(response.data);
+  //     });
+  // }, []);
 
-  useEffect(() => {
-    axios
-      .get(
-        `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`
-      )
-      .then((response) => {
-        setCities(response.data);
-      });
-  }, [selectedUf]);
+  // useEffect(() => {
+  //   axios
+  //     .get(
+  //       `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/municipios`
+  //     )
+  //     .then((response) => {
+  //       setCities(response.data);
+  //     });
+  // }, [selectedUf]);
 
   function handleSelectedUF(event: ChangeEvent<HTMLSelectElement>) {
     const uf = event.target.value;
@@ -67,6 +80,19 @@ const CreatePoint = () => {
   function handleSelectedCity(event: ChangeEvent<HTMLSelectElement>) {
     const city = event.target.value;
     setSelectedCity(city);
+  }
+
+  function LocationMarker() {
+    const map = useMapEvents({
+      click() {
+        map.addEventListener("click", (event: LeafletMouseEvent) => {
+          console.log(event.latlng);
+          setPosition([event.latlng.lat, event.latlng.lng]);
+        });
+      },
+    });
+
+    return <Marker position={position}></Marker>;
   }
 
   return (
@@ -109,22 +135,14 @@ const CreatePoint = () => {
             <h2>Endereço</h2>
             <span>Selecione o endereço no mapa</span>
           </legend>
-          <MapContainer
-            center={[51.505, -0.09]}
-            zoom={13}
-            scrollWheelZoom={false}
-          >
+          <MapContainer center={position} zoom={13}>
             <TileLayer
               attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <Marker position={[51.505, -0.09]}>
-              <Popup>
-                A pretty CSS3 popup. <br /> Easily customizable.
-              </Popup>
-            </Marker>
+            <LocationMarker />
           </MapContainer>
-          ,
+
           <div className="field-group">
             <div className="field">
               <label htmlFor="uf">Estado (UF)</label>
